@@ -30,3 +30,14 @@ module.exports = sequelize;
 +var { DataTypes } = require('sequelize');
 +var sequelize = require('../db');
 +var User = require(path.join(__dirname, '../models/user'))(sequelize, DataTypes);
+----------
+1. файл app.js добавить порт, строка 13 (логическая ошибка)
+-app.listen(function() {
++app.listen(4000, function() {
+1. файл db.js добавить порт DB, строка 6 (логическая ошибка)
++port: 5433,
+1. файл package.json Обновить библиотеки до последних версий, строка 14, 15 (логическая ошибка)
+-"pg": "^7.6.0",
+-"sequelize": "^4.41.0"
++"pg": "^8.6.0",
++"sequelize": "^6.6.2"
