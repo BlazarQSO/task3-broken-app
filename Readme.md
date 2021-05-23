@@ -1,3 +1,12 @@
+### Отрифакторины были почти все строки кода. Cтроки ошибок указаны относительно оригинального темплейта, либо можно в github выбрать соответствующие комиты и там увидеть изменения:
+
+[**fix: fix compilation bugs**](https://github.com/BlazarQSO/task3-broken-app/commit/f6f9feba3e0a02f1e4a7115f526a821388786687)
+
+[**fix: fix bugs and make to connect to DB**](https://github.com/BlazarQSO/task3-broken-app/commit/730291a427ada7c5ab7095743fb786bc254925ac)
+
+[**fix: fix logical bugs**](https://github.com/BlazarQSO/task3-broken-app/commit/475e6ea5cbf1217f05bf108fe3312dca621671fa)
+
+---
 ## Ошибки компиляции:
 ---
 1. файл <span style="color:crimson">**'./models/game.js'**</span> добавить экспорт, строка 1 (ошибка компиляции)
@@ -122,9 +131,20 @@
 +    res.status(401).send('The password must be at least 3 characters long');
 + }
 ```
-11. файл <span style="color:crimson">**'./models/game.js'**</span> поле тайтл не должно быть пустым, строки 6-8 (логическая ошибка)
+11. файл <span style="color:crimson">**'./models/game.js'**</span> поле title не должно быть пустым, строки 6-8 (логическая ошибка)
 ```javascript
 + validate: {
 +    notEmpty: true,
 + },
 ```
+## Рефактор кода
+1. Вынесен весь текст в константы
+1. Все "магические числа" вынесены в константы
+1. Изменены ключевые слова var, let на const
+1. Вместо function применены стрелочные функции
+1. Изменены названия сущностей таблицы и файлы
+1. Применена деструктуризация для переменных
+1. Добавлен eslint с конфигом airbnb-base
+1. Убраны пустые строки, убраны комментарии и консоль логи, не связанные с работой сервера
+1. Добавлены все запятые и точки с запятыми
+1. Рефактор промисов: все функции ошибок перенесены в блок catch
