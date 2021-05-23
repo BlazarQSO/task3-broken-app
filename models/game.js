@@ -1,38 +1,40 @@
-function(sequelize, DataTypes) {
-    return sequelize.define('game', {
-        title: {
-            type: DataTypes.STRING(25),
-            allowNull: false,
-        },
+const { TABLE_NAME } = require('../const');
 
-        owner_id: {
-            type: DataTypes.INTEGER,
-            allowNull: false
+module.exports = (sequelize, DataTypes) => sequelize.define(TABLE_NAME.GAME, {
+    title: {
+        type: DataTypes.STRING(25),
+        allowNull: false,
+        validate: {
+            notEmpty: true,
         },
+    },
 
-        studio: {
-            type: DataTypes.STRING,
-            allowNull: false,            
+    ownerId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
+
+    studio: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+
+    esrbRating: {
+        type: DataTypes.CHAR(5),
+        allowNull: false,
+    },
+
+    userRating: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        validate: {
+            len: [1, 5],
         },
+    },
 
-        esrb_rating: {
-            type: DataTypes.CHAR(5),
-            allowNull: false,
-        },
-
-        user_rating: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            validate: {
-                min: 1,
-                max: 5
-            }
-        },
-
-        have_played : {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false,
-            allowNull: false
-        }
-    })
-}
+    havePlayed: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+    },
+});

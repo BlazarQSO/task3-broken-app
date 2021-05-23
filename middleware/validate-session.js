@@ -1,29 +1,40 @@
 const jwt = require('jsonwebtoken');
-var User = require('sequelize').import('../models/user');
+const { DataTypes } = require('sequelize');
+const sequelize = require('../db');
+const modelUser = require('../models/user');
+const {
+    HTTP_METHOD,
+    STATUS_CODE,
+    JWT_MESSAGE,
+    errorMessage,
+    HttpMessage,
+} = require('../const');
 
-module.exports = function (req, res, next) {
-    if (req.method == 'OPTIONS') {
-        next();   // allowing options as a method for request
+const User = modelUser(sequelize, DataTypes);
+
+module.exports = (req, res, next) => {
+    if (req.method === HTTP_METHOD.OPTIONS) {
+        next();
     } else {
-        var sessionToken = req.headers.authorization;
-        console.log(sessionToken);
-        if (!sessionToken) return res.status(403).send({ auth: false, message: "No token provided." });
-        else {
-            jwt.verify(sessionToken, 'lets_play_sum_games_man', (err, decoded) => {
-                if (decoded) {
-                    User.findOne({ where: { id: decoded.id } }).then(user => {
-                        req.user = user;
-                        console.log(`user: ${user}`)
-                        next()
-                    },
-                        function () {
-                            res.status(401).send({ error: "not authorized" });
-                        })
-
-                } else {
-                    res.status(400).send({ error: "not authorized" })
-                }
-            });
+        const sessionToken = req.headers.authorization;
+        if (!sessionToken) {
+            return res
+                .status(STATUS_CODE.UNAUTHORIZED)
+                .send({ auth: false, message: HttpMessage.NO_TOKEN_PROVIDED });
         }
+
+        jwt.verify(sessionToken, JWT_MESSAGE, (err, decoded) => {
+            if (decoded) {
+                User.findOne({ where: { id: decoded.id } })
+                    .then((user) => {
+                        req.user = user;
+                        next();
+                    }).catch(() => res
+                        .status(STATUS_CODE.FORBIDDEN)
+                        .send(errorMessage(HttpMessage.FORBIDDEN)));
+            } else {
+                res.status(STATUS_CODE.UNAUTHORIZED).send(errorMessage(HttpMessage.UNAUTHORIZED));
+            }
+        });
     }
-}
+};
