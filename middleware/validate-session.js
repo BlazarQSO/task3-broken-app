@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
-const path = require('path');
+const { DataTypes } = require('sequelize');
+const sequelize = require('../db');
+const modelUser = require('../models/user');
 const {
     HTTP_METHOD,
     STATUS_CODE,
@@ -8,11 +10,9 @@ const {
     HttpMessage,
 } = require('../const');
 
-const { DataTypes } = require('sequelize');
-const sequelize = require('../db');
-const User = require(path.join(__dirname, '../models/user'))(sequelize, DataTypes);
+const User = modelUser(sequelize, DataTypes);
 
-module.exports = function (req, res, next) {
+module.exports = (req, res, next) => {
     if (req.method === HTTP_METHOD.OPTIONS) {
         next();
     } else {
@@ -22,21 +22,19 @@ module.exports = function (req, res, next) {
                 .status(STATUS_CODE.UNAUTHORIZED)
                 .send({ auth: false, message: HttpMessage.NO_TOKEN_PROVIDED });
         }
-        else {
-            jwt.verify(sessionToken, JWT_MESSAGE, (err, decoded) => {
-                if (decoded) {
-                    User.findOne({ where: { id: decoded.id } }).then(user => {
-                        req.user = user;
-                        next();
-                    },
-                        function () {
-                            res.status(STATUS_CODE.FORBIDDEN).send(errorMessage(HttpMessage.FORBIDDEN));
-                        })
 
-                } else {
-                    res.status(STATUS_CODE.UNAUTHORIZED).send(errorMessage(HttpMessage.UNAUTHORIZED));
-                }
-            });
-        }
+        jwt.verify(sessionToken, JWT_MESSAGE, (err, decoded) => {
+            if (decoded) {
+                User.findOne({ where: { id: decoded.id } }).then((user) => {
+                    req.user = user;
+                    next();
+                },
+                () => {
+                    res.status(STATUS_CODE.FORBIDDEN).send(errorMessage(HttpMessage.FORBIDDEN));
+                });
+            } else {
+                res.status(STATUS_CODE.UNAUTHORIZED).send(errorMessage(HttpMessage.UNAUTHORIZED));
+            }
+        });
     }
-}
+};

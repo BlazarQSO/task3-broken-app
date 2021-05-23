@@ -1,6 +1,9 @@
 const router = require('express').Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { DataTypes } = require('sequelize');
+const sequelize = require('../db');
+const modelUser = require('../models/user');
 const {
     USER_ROUTER,
     MIN_LENGTH_PASSWORD,
@@ -13,14 +16,11 @@ const {
     DAY,
 } = require('../const');
 
-const path = require('path');
-const { DataTypes } = require('sequelize');
-const sequelize = require('../db');
-const User = require(path.join(__dirname, '../models/user'))(sequelize, DataTypes);
+const User = modelUser(sequelize, DataTypes);
 
 router.post(USER_ROUTER.SIGN_UP, (req, res) => {
     if (req.body.user.password.length < MIN_LENGTH_PASSWORD) {
-        res.status(STATUS_CODE.UNAUTHORIZED).send(HttpMessage.ERROR_LENGTH_PASSWORD);
+        return res.status(STATUS_CODE.UNAUTHORIZED).send(HttpMessage.ERROR_LENGTH_PASSWORD);
     }
 
     User.create({
@@ -30,7 +30,7 @@ router.post(USER_ROUTER.SIGN_UP, (req, res) => {
         email: req.body.user.email,
     })
         .then(
-            function signupSuccess(user) {
+            (user) => {
                 const token = jwt.sign({ id: user.id }, JWT_MESSAGE, { expiresIn: DAY });
                 res.status(STATUS_CODE.OK).json({
                     user,
@@ -38,32 +38,30 @@ router.post(USER_ROUTER.SIGN_UP, (req, res) => {
                 });
             },
 
-            function signupFail(err) {
+            (err) => {
                 res.status(STATUS_CODE.INTERNAL_SERVER_ERROR).send(err.message);
-            }
-        )
-})
+            },
+        );
+});
 
 router.post(USER_ROUTER.SIGN_IN, (req, res) => {
-    User.findOne({ where: { username: req.body.user.username } }).then(user => {
+    User.findOne({ where: { username: req.body.user.username } }).then((user) => {
         if (user) {
-            bcrypt.compare(req.body.user.password, user.passwordHash, function (err, matches) {
+            bcrypt.compare(req.body.user.password, user.passwordHash, (err, matches) => {
                 if (matches) {
                     const token = jwt.sign({ id: user.id }, JWT_MESSAGE, { expiresIn: DAY });
-                    res.json({
+                    return res.json({
                         user,
                         message: SUCCESSFULLY,
                         sessionToken: token,
                     });
-                } else {
-                    res.status(STATUS_CODE.UNAUTHORIZED).send(errorMessage(HttpMessage.ERROR_PASSWORD));
                 }
+                return res.status(STATUS_CODE.UNAUTHORIZED).send(errorMessage(HttpMessage.ERROR_PASSWORD));
             });
         } else {
-            res.status(STATUS_CODE.UNAUTHORIZED).send(errorMessage(HttpMessage.ERROR_LOGIN));
+            return res.status(STATUS_CODE.UNAUTHORIZED).send(errorMessage(HttpMessage.ERROR_LOGIN));
         }
-
-    })
-})
+    });
+});
 
 module.exports = router;

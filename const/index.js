@@ -8,18 +8,18 @@ const STATUS_CODE = {
     NOT_FOUND: 404,
     UNPROCESSABLE_ENTITY: 422,
     INTERNAL_SERVER_ERROR: 500,
-}
+};
 
 const TABLE_NAME = {
     USER: 'user',
     GAME: 'game',
-}
+};
 
 const ServerMessage = {
     ConnectedToDB: 'Connected to DB',
     WithError: (err) => `Error: ${err}`,
     WithArg: (arg) => `App is listening on ${arg}`,
-}
+};
 
 const HttpMessage = {
     ERROR_PASSWORD: 'Passwords do not match.',
@@ -34,16 +34,16 @@ const HttpMessage = {
     GAME_CREATED: 'Game created.',
     UPDATED: 'Successfully updated.',
     DELETE: 'Successfully deleted',
-}
+};
 
 const HTTP_METHOD = {
     OPTIONS: 'OPTIONS',
-}
+};
 
 const USER_ROUTER = {
     SIGN_UP: '/signup',
     SIGN_IN: '/signin',
-}
+};
 
 const GAME_ROUTER = {
     GET_ALL: '/all',
@@ -51,7 +51,7 @@ const GAME_ROUTER = {
     CREATE: '/create',
     UPDATE: '/update/:id',
     REMOVE: '/remove/:id',
-}
+};
 
 const errorMessage = (message) => ({ error: message });
 
@@ -77,4 +77,4 @@ module.exports = {
     BCRYPT_SALT,
     MIN_LENGTH_PASSWORD,
     DAY,
-}
+};
