@@ -20,7 +20,7 @@ const User = modelUser(sequelize, DataTypes);
 
 router.post(USER_ROUTER.SIGN_UP, (req, res) => {
     const {
-        password, full_name, username, email,
+        password, fullName, userName, email,
     } = req.body.user;
 
     if (password.length < MIN_LENGTH_PASSWORD) {
@@ -28,8 +28,8 @@ router.post(USER_ROUTER.SIGN_UP, (req, res) => {
     }
 
     User.create({
-        full_name,
-        username,
+        fullName,
+        userName,
         passwordHash: bcrypt.hashSync(password, BCRYPT_SALT),
         email,
     })
@@ -44,9 +44,9 @@ router.post(USER_ROUTER.SIGN_UP, (req, res) => {
 });
 
 router.post(USER_ROUTER.SIGN_IN, (req, res) => {
-    const { username, password } = req.body.user;
+    const { userName, password } = req.body.user;
 
-    User.findOne({ where: { username } }).then((user) => {
+    User.findOne({ where: { userName } }).then((user) => {
         if (user) {
             bcrypt.compare(password, user.passwordHash, (err, matches) => {
                 if (matches) {

@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => sequelize.define(TABLE_NAME.GAME, {
         },
     },
 
-    owner_id: {
+    ownerId: {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
@@ -19,12 +19,12 @@ module.exports = (sequelize, DataTypes) => sequelize.define(TABLE_NAME.GAME, {
         allowNull: false,
     },
 
-    esrb_rating: {
+    esrbRating: {
         type: DataTypes.CHAR(5),
         allowNull: false,
     },
 
-    user_rating: {
+    userRating: {
         type: DataTypes.INTEGER,
         allowNull: false,
         validate: {
@@ -32,7 +32,7 @@ module.exports = (sequelize, DataTypes) => sequelize.define(TABLE_NAME.GAME, {
         },
     },
 
-    have_played: {
+    havePlayed: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
         allowNull: false,

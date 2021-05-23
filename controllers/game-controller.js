@@ -11,7 +11,7 @@ const {
 const Game = modelGame(sequelize, DataTypes);
 
 router.get(GAME_ROUTER.GET_ALL, (req, res) => {
-    Game.findAll({ where: { owner_id: req.user.id } })
+    Game.findAll({ where: { ownerId: req.user.id } })
         .then((data) => {
             res.status(STATUS_CODE.OK).json({
                 games: data,
@@ -25,7 +25,7 @@ router.get(GAME_ROUTER.GET_ALL, (req, res) => {
 });
 
 router.get(GAME_ROUTER.GET, (req, res) => {
-    Game.findOne({ where: { id: req.params.id, owner_id: req.user.id } })
+    Game.findOne({ where: { id: req.params.id, ownerId: req.user.id } })
         .then((game) => {
             res.status(STATUS_CODE.OK).json({
                 game,
@@ -39,11 +39,11 @@ router.get(GAME_ROUTER.GET, (req, res) => {
 
 router.post(GAME_ROUTER.CREATE, (req, res) => {
     const {
-        title, studio, esrb_rating, user_rating, have_played,
+        title, studio, esrbRating, userRating, havePlayed,
     } = req.body.game;
 
     Game.create({
-        title, studio, esrb_rating, user_rating, have_played, owner_id: req.user.id,
+        title, studio, esrbRating, userRating, havePlayed, ownerId: req.user.id,
     })
         .then((game) => {
             res.status(STATUS_CODE.CREATED).json({
@@ -58,14 +58,14 @@ router.post(GAME_ROUTER.CREATE, (req, res) => {
 
 router.put(GAME_ROUTER.UPDATE, (req, res) => {
     const {
-        title, studio, esrb_rating, user_rating, have_played,
+        title, studio, esrbRating, userRating, havePlayed,
     } = req.body.game;
 
     Game.update({
-        title, studio, esrb_rating, user_rating, have_played,
+        title, studio, esrbRating, userRating, havePlayed,
     },
     {
-        where: { id: req.params.id, owner_id: req.user.id },
+        where: { id: req.params.id, ownerId: req.user.id },
     })
         .then((game) => {
             res.status(STATUS_CODE.OK).json({
@@ -80,10 +80,10 @@ router.put(GAME_ROUTER.UPDATE, (req, res) => {
 
 router.delete(GAME_ROUTER.REMOVE, (req, res) => {
     const { id } = req.params;
-    const { id: owner_id } = req.user;
+    const { id: ownerId } = req.user;
 
     Game.destroy({
-        where: { id, owner_id },
+        where: { id, ownerId },
     })
         .then((game) => {
             res.status(STATUS_CODE.OK).json({

@@ -1,15 +1,15 @@
 const { TABLE_NAME } = require('../const');
 
 module.exports = (sequelize, DataTypes) => sequelize.define(TABLE_NAME.USER, {
-    full_name: {
+    fullName: {
         type: DataTypes.STRING,
         allowNull: false,
     },
 
-    username: {
+    userName: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: 'username',
+        unique: 'userName',
         validate: {
             len: [3, 20],
         },
