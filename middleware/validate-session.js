@@ -1,30 +1,40 @@
 const jwt = require('jsonwebtoken');
-var path = require('path');
-var { DataTypes } = require('sequelize');
-var sequelize = require('../db');
-var User = require(path.join(__dirname, '../models/user'))(sequelize, DataTypes);
+const path = require('path');
+const {
+    HTTP_METHOD,
+    STATUS_CODE,
+    JWT_MESSAGE,
+    errorMessage,
+    HttpMessage,
+} = require('../const');
+
+const { DataTypes } = require('sequelize');
+const sequelize = require('../db');
+const User = require(path.join(__dirname, '../models/user'))(sequelize, DataTypes);
 
 module.exports = function (req, res, next) {
-    if (req.method == 'OPTIONS') {
-        next();   // allowing options as a method for request
+    if (req.method === HTTP_METHOD.OPTIONS) {
+        next();
     } else {
-        var sessionToken = req.headers.authorization;
-        console.log(sessionToken);
-        if (!sessionToken) return res.status(403).send({ auth: false, message: "No token provided." });
+        const sessionToken = req.headers.authorization;
+        if (!sessionToken) {
+            return res
+                .status(STATUS_CODE.UNAUTHORIZED)
+                .send({ auth: false, message: HttpMessage.NO_TOKEN_PROVIDED });
+        }
         else {
-            jwt.verify(sessionToken, 'lets_play_sum_games_man', (err, decoded) => {
+            jwt.verify(sessionToken, JWT_MESSAGE, (err, decoded) => {
                 if (decoded) {
                     User.findOne({ where: { id: decoded.id } }).then(user => {
                         req.user = user;
-                        console.log(`user: ${user}`)
-                        next()
+                        next();
                     },
                         function () {
-                            res.status(401).send({ error: "not authorized" });
+                            res.status(STATUS_CODE.FORBIDDEN).send(errorMessage(HttpMessage.FORBIDDEN));
                         })
 
                 } else {
-                    res.status(400).send({ error: "not authorized" })
+                    res.status(STATUS_CODE.UNAUTHORIZED).send(errorMessage(HttpMessage.UNAUTHORIZED));
                 }
             });
         }

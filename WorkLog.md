@@ -58,7 +58,7 @@
 ---
 ## Логические  ошибки:
 ---
-1. файл <span style="color:crimson">**'app.js'**</span> добавить порт 4000 локального хотса, строка 13 (логическая ошибка)
+1. файл <span style="color:crimson">**'app.js'**</span> добавить порт 4000 локального хоста, строка 13 (логическая ошибка)
 ```javascript
 - app.listen(function() {
 
@@ -88,7 +88,7 @@
 
 + passwordHash: bcrypt.hashSync(req.body.user.password, 10),
 ```
-6. файл <span style="color:crimson">**'./controllers/gamecontroller.js'**</span> исправить привязку игр по индетификатору пользователя, строка 45 (логическая ошибка)
+6. файл <span style="color:crimson">**'./controllers/gamecontroller.js'**</span> исправить привязку игр по идентификатору  пользователя, строка 45 (логическая ошибка)
 ```javascript
 - owner_id: req.body.user.id,
 
@@ -100,13 +100,13 @@
 
 + games: data,
 ```
-8. файл <span style="color:crimson">**'./controllers/gamecontroller.js'**</span> исправить передачу индетификатора для поиска, строка 76 (логическая ошибка)
+8. файл <span style="color:crimson">**'./controllers/gamecontroller.js'**</span> исправить передачу идентификатора для поиска, строка 76 (логическая ошибка)
 ```javascript
 - owner_id: req.user
 
 + owner_id: req.user.id
 ```
-9. файл <span style="color:crimson">**'./models/user.js'**</span> добавить необходимые поля для корректного создания базы данных, чтобы имя пользователя было уникальное, имя пользователя не должно быть мньше трёх символов и больше 20, строки 10-14 (логическая ошибка)
+9. файл <span style="color:crimson">**'./models/user.js'**</span> добавить необходимые поля для корректного создания базы данных, чтобы имя пользователя было уникальное, имя пользователя не должно быть меньше трёх символов и больше 20, строки 10-14 (логическая ошибка)
 ```javascript
 - allowNull: false
 

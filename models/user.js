@@ -1,5 +1,7 @@
-module.exports = function(sequelize, DataTypes) {
-    return sequelize.define('user', {
+const { TABLE_NAME } = require('../const');
+
+module.exports = (sequelize, DataTypes) => {
+    return sequelize.define(TABLE_NAME.USER, {
         full_name: {
             type: DataTypes.STRING,
             allowNull: false

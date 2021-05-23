@@ -1,5 +1,7 @@
-module.exports = function(sequelize, DataTypes) {
-    return sequelize.define('game', {
+const { TABLE_NAME } = require('../const');
+
+module.exports = function (sequelize, DataTypes) {
+    return sequelize.define(TABLE_NAME.GAME, {
         title: {
             type: DataTypes.STRING(25),
             allowNull: false,
@@ -27,8 +29,7 @@ module.exports = function(sequelize, DataTypes) {
             type: DataTypes.INTEGER,
             allowNull: false,
             validate: {
-                min: 1,
-                max: 5
+                len: [1, 5],
             }
         },
 
