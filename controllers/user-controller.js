@@ -7,7 +7,6 @@ const modelUser = require('../models/user');
 const {
     USER_ROUTER,
     MIN_LENGTH_PASSWORD,
-    SUCCESSFULLY,
     BCRYPT_SALT,
     STATUS_CODE,
     JWT_MESSAGE,
@@ -26,19 +25,14 @@ router.post(USER_ROUTER.SIGN_UP, (req, res) => {
     if (password.length < MIN_LENGTH_PASSWORD) {
         return res.status(STATUS_CODE.UNAUTHORIZED).send(HttpMessage.ERROR_LENGTH_PASSWORD);
     }
+    const passwordHash = bcrypt.hashSync(password, BCRYPT_SALT);
 
     User.create({
-        fullName,
-        userName,
-        passwordHash: bcrypt.hashSync(password, BCRYPT_SALT),
-        email,
+        fullName, userName, passwordHash, email,
     })
         .then((user) => {
             const token = jwt.sign({ id: user.id }, JWT_MESSAGE, { expiresIn: DAY });
-            res.status(STATUS_CODE.OK).json({
-                user,
-                token,
-            });
+            res.status(STATUS_CODE.OK).json({ user, token });
         })
         .catch((err) => res.status(STATUS_CODE.INTERNAL_SERVER_ERROR).send(err.message));
 });
@@ -50,12 +44,9 @@ router.post(USER_ROUTER.SIGN_IN, (req, res) => {
         if (user) {
             bcrypt.compare(password, user.passwordHash, (err, matches) => {
                 if (matches) {
-                    const token = jwt.sign({ id: user.id }, JWT_MESSAGE, { expiresIn: DAY });
-                    return res.json({
-                        user,
-                        message: SUCCESSFULLY,
-                        sessionToken: token,
-                    });
+                    const sessionToken = jwt.sign({ id: user.id }, JWT_MESSAGE, { expiresIn: DAY });
+                    const message = HttpMessage.SUCCESSFULLY;
+                    return res.json({ user, message, sessionToken });
                 }
                 return res.status(STATUS_CODE.UNAUTHORIZED).send(errorMessage(HttpMessage.ERROR_PASSWORD));
             });
