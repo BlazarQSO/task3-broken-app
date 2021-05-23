@@ -8,10 +8,14 @@ var sequelize = require('../db');
 var User = require(path.join(__dirname, '../models/user'))(sequelize, DataTypes);
 
 router.post('/signup', (req, res) => {
+    if (req.body.user.password.length < 3) {
+        res.status(401).send('The password must be at least 3 characters long');
+    }
+
     User.create({
         full_name: req.body.user.full_name,
         username: req.body.user.username,
-        passwordhash: bcrypt.hashSync(req.body.user.password, 10),
+        passwordHash: bcrypt.hashSync(req.body.user.password, 10),
         email: req.body.user.email,
     })
         .then(

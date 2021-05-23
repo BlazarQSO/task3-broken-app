@@ -3,6 +3,9 @@ module.exports = function(sequelize, DataTypes) {
         title: {
             type: DataTypes.STRING(25),
             allowNull: false,
+            validate: {
+                notEmpty: true,
+            },
         },
 
         owner_id: {
