@@ -19,35 +19,36 @@ const {
 const User = modelUser(sequelize, DataTypes);
 
 router.post(USER_ROUTER.SIGN_UP, (req, res) => {
-    if (req.body.user.password.length < MIN_LENGTH_PASSWORD) {
+    const {
+        password, full_name, username, email,
+    } = req.body.user;
+
+    if (password.length < MIN_LENGTH_PASSWORD) {
         return res.status(STATUS_CODE.UNAUTHORIZED).send(HttpMessage.ERROR_LENGTH_PASSWORD);
     }
 
     User.create({
-        full_name: req.body.user.full_name,
-        username: req.body.user.username,
-        passwordHash: bcrypt.hashSync(req.body.user.password, BCRYPT_SALT),
-        email: req.body.user.email,
+        full_name,
+        username,
+        passwordHash: bcrypt.hashSync(password, BCRYPT_SALT),
+        email,
     })
-        .then(
-            (user) => {
-                const token = jwt.sign({ id: user.id }, JWT_MESSAGE, { expiresIn: DAY });
-                res.status(STATUS_CODE.OK).json({
-                    user,
-                    token,
-                });
-            },
-
-            (err) => {
-                res.status(STATUS_CODE.INTERNAL_SERVER_ERROR).send(err.message);
-            },
-        );
+        .then((user) => {
+            const token = jwt.sign({ id: user.id }, JWT_MESSAGE, { expiresIn: DAY });
+            res.status(STATUS_CODE.OK).json({
+                user,
+                token,
+            });
+        })
+        .catch((err) => res.status(STATUS_CODE.INTERNAL_SERVER_ERROR).send(err.message));
 });
 
 router.post(USER_ROUTER.SIGN_IN, (req, res) => {
-    User.findOne({ where: { username: req.body.user.username } }).then((user) => {
+    const { username, password } = req.body.user;
+
+    User.findOne({ where: { username } }).then((user) => {
         if (user) {
-            bcrypt.compare(req.body.user.password, user.passwordHash, (err, matches) => {
+            bcrypt.compare(password, user.passwordHash, (err, matches) => {
                 if (matches) {
                     const token = jwt.sign({ id: user.id }, JWT_MESSAGE, { expiresIn: DAY });
                     return res.json({

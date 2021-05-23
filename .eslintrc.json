@@ -21,6 +21,6 @@
         ],
         "indent": [ "error", 4 ],
         "consistent-return": "off",
-        "no-dynamic-require": "off"
+        "no-console": "off"
     }
 }

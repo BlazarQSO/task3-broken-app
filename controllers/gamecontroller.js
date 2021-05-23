@@ -12,114 +12,88 @@ const Game = modelGame(sequelize, DataTypes);
 
 router.get(GAME_ROUTER.GET_ALL, (req, res) => {
     Game.findAll({ where: { owner_id: req.user.id } })
-        .then(
-            (data) => {
-                res.status(STATUS_CODE.OK).json({
-                    games: data,
-                    message: HttpMessage.DATA_FETCHED,
-                });
-            },
-
-            () => {
-                res.status(STATUS_CODE.NOT_FOUND).json({
-                    message: HttpMessage.DATA_NOT_FOUND,
-                });
-            },
-        );
+        .then((data) => {
+            res.status(STATUS_CODE.OK).json({
+                games: data,
+                message: HttpMessage.DATA_FETCHED,
+            });
+        }).catch(() => {
+            res.status(STATUS_CODE.NOT_FOUND).json({
+                message: HttpMessage.DATA_NOT_FOUND,
+            });
+        });
 });
 
 router.get(GAME_ROUTER.GET, (req, res) => {
     Game.findOne({ where: { id: req.params.id, owner_id: req.user.id } })
-        .then(
-            (game) => {
-                res.status(STATUS_CODE.OK).json({
-                    game,
-                });
-            },
-
-            () => {
-                res.status(STATUS_CODE.NOT_FOUND).json({
-                    message: HttpMessage.DATA_NOT_FOUND,
-                });
-            },
-        );
+        .then((game) => {
+            res.status(STATUS_CODE.OK).json({
+                game,
+            });
+        }).catch(() => {
+            res.status(STATUS_CODE.NOT_FOUND).json({
+                message: HttpMessage.DATA_NOT_FOUND,
+            });
+        });
 });
 
 router.post(GAME_ROUTER.CREATE, (req, res) => {
-    Game.create({
-        title: req.body.game.title,
-        owner_id: req.user.id,
-        studio: req.body.game.studio,
-        esrb_rating: req.body.game.esrb_rating,
-        user_rating: req.body.game.user_rating,
-        have_played: req.body.game.have_played,
-    })
-        .then(
-            (game) => {
-                res.status(STATUS_CODE.CREATED).json({
-                    game,
-                    message: HttpMessage.GAME_CREATED,
-                });
-            },
+    const {
+        title, studio, esrb_rating, user_rating, have_played,
+    } = req.body.game;
 
-            (err) => {
-                res.status(STATUS_CODE.UNPROCESSABLE_ENTITY).send(err.message);
-            },
-        );
+    Game.create({
+        title, studio, esrb_rating, user_rating, have_played, owner_id: req.user.id,
+    })
+        .then((game) => {
+            res.status(STATUS_CODE.CREATED).json({
+                game,
+                message: HttpMessage.GAME_CREATED,
+            });
+        })
+        .catch((err) => res
+            .status(STATUS_CODE.UNPROCESSABLE_ENTITY)
+            .send(err.message));
 });
 
 router.put(GAME_ROUTER.UPDATE, (req, res) => {
+    const {
+        title, studio, esrb_rating, user_rating, have_played,
+    } = req.body.game;
+
     Game.update({
-        title: req.body.game.title,
-        studio: req.body.game.studio,
-        esrb_rating: req.body.game.esrb_rating,
-        user_rating: req.body.game.user_rating,
-        have_played: req.body.game.have_played,
+        title, studio, esrb_rating, user_rating, have_played,
     },
     {
-        where: {
-            id: req.params.id,
-            owner_id: req.user.id,
-        },
+        where: { id: req.params.id, owner_id: req.user.id },
     })
-        .then(
-            (game) => {
-                res.status(STATUS_CODE.OK).json({
-                    game,
-                    message: HttpMessage.UPDATED,
-                });
-            },
-
-            (err) => {
-                res.status(STATUS_CODE.INTERNAL_SERVER_ERROR).json({
-                    message: err.message,
-                });
-            },
-
-        );
+        .then((game) => {
+            res.status(STATUS_CODE.OK).json({
+                game,
+                message: HttpMessage.UPDATED,
+            });
+        })
+        .catch((err) => res.status(STATUS_CODE.INTERNAL_SERVER_ERROR).json({
+            message: err.message,
+        }));
 });
 
 router.delete(GAME_ROUTER.REMOVE, (req, res) => {
-    Game.destroy({
-        where: {
-            id: req.params.id,
-            owner_id: req.user.id,
-        },
-    })
-        .then(
-            (game) => {
-                res.status(STATUS_CODE.OK).json({
-                    game,
-                    message: STATUS_CODE.DELETE,
-                });
-            },
+    const { id } = req.params;
+    const { id: owner_id } = req.user;
 
-            (err) => {
-                res.status(STATUS_CODE.INTERNAL_SERVER_ERROR).json({
-                    error: err.message,
-                });
-            },
-        );
+    Game.destroy({
+        where: { id, owner_id },
+    })
+        .then((game) => {
+            res.status(STATUS_CODE.OK).json({
+                game,
+                message: STATUS_CODE.DELETE,
+            });
+        })
+        .catch((err) => res.status(STATUS_CODE.INTERNAL_SERVER_ERROR).json({
+            error: err.message,
+        }));
 });
 
 module.exports = router;

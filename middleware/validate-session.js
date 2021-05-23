@@ -25,13 +25,13 @@ module.exports = (req, res, next) => {
 
         jwt.verify(sessionToken, JWT_MESSAGE, (err, decoded) => {
             if (decoded) {
-                User.findOne({ where: { id: decoded.id } }).then((user) => {
-                    req.user = user;
-                    next();
-                },
-                () => {
-                    res.status(STATUS_CODE.FORBIDDEN).send(errorMessage(HttpMessage.FORBIDDEN));
-                });
+                User.findOne({ where: { id: decoded.id } })
+                    .then((user) => {
+                        req.user = user;
+                        next();
+                    }).catch(() => res
+                        .status(STATUS_CODE.FORBIDDEN)
+                        .send(errorMessage(HttpMessage.FORBIDDEN)));
             } else {
                 res.status(STATUS_CODE.UNAUTHORIZED).send(errorMessage(HttpMessage.UNAUTHORIZED));
             }
